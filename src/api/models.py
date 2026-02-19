@@ -16,24 +16,27 @@ class Connection:
     start_time: datetime
     end_time: datetime
     transport_id: str 
+    planned_departure: datetime
+    planned_arrival: datetime
 
     @property
     def duration(self) -> int:
         return int((self.end_time-self.start_time).total_seconds() /60)
+
+    @property
+    def delay(self) -> int:
+        #Verspätung in Minuten
+        return int((self.start_time-self.planned_departure).total_seconds()/60)
 
 @dataclass
 class Journey:
     start: Stop
     end: Stop
     start_time: datetime
-    
+    connections: list = field(default_factory=list)
+        
     @property
-    def connections -> list = field(default_factory=list):
-        #To be determined ordered list of Connection-type objects which ultimately connect, efficient or not, self.start and self.end
-        pass
-    
-    @property
-    def journey_time -> int:
+    def journey_time(self) -> int:
         #Differenz von Ankunftszeit der letzten Connection und Startzeit der ersten Connection
         if len(self.connections)>0:
             return int((self.connections[-1].end_time - self.connections[0].start_time).total_seconds() /60)
@@ -41,3 +44,13 @@ class Journey:
             #"It's over niiiine thousand!"
             return 9001
 
+    @property
+    def num_transfers(self) -> int:
+        #Anzahl Connections minus one
+        return max(len(self.connections)-1,0)
+    
+    @property
+    def end_time(self) -> datetime:
+        if len(self.connections)>0:
+            return self.connections[-1].end_time
+        return self.start_time
