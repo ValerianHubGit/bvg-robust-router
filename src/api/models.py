@@ -28,6 +28,9 @@ class Connection:
         #Verspätung in Minuten
         return int((self.start_time-self.planned_departure).total_seconds()/60)
 
+
+
+
 @dataclass
 class Journey:
     start: Stop
@@ -43,14 +46,24 @@ class Journey:
         else:
             #"It's over niiiine thousand!"
             return 9001
-
-    @property
-    def num_transfers(self) -> int:
-        #Anzahl Connections minus one
-        return max(len(self.connections)-1,0)
-    
+        
     @property
     def end_time(self) -> datetime:
         if len(self.connections)>0:
             return self.connections[-1].end_time
         return self.start_time
+    @property
+    def transfer_windows(self) -> list:
+        windows=[]
+        for i in range(len(self.connections)-1):
+            #identify real transfers
+            if self.connections[i].transport_id != self.connections[i+1].transport_id:
+                #append time window for transfer between connection i and i+1 in minutes
+                windows.append((self.connections[i+1].start_time-self.connections[i].end_time).total_seconds() /60)
+        return windows
+        
+    @property
+    def num_transfers(self) -> int:
+        #Anzahl echter transfers
+        return len(self.transfer_windows)
+        
