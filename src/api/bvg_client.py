@@ -30,7 +30,9 @@ def get_stops(query: str) -> list[Stop]:
         stop = Stop(name=item["name"],
                     latitude=item["location"]["latitude"],
                     longitude=item["location"]["longitude"],
-                    transportations=transportations )
+                    id= item["id"],
+                    transportations=transportations
+                    )
        
         stops.append(stop)
     
@@ -54,28 +56,40 @@ def get_journeys(from_id: str, to_id: str ) -> list[Journey]:
     for journey_data in response.json()["journeys"]:
         connections = []
         for leg in journey_data["legs"]:
-            # 1. start und end als Stop-Objekte aus leg["origin"] und leg["destination"] bauen
+            #Wir sortieren direkt jene Legs ohne Zeinangaben aus
+            if not leg.get("departure") or not leg.get("arrival"):
+                    continue
+            #start und end als Stop-Objekte aus leg["origin"] und leg["destination"] bauen  
             transportations_start = [product for product, active in leg["origin"]["products"].items()  if active]
             start_stop=Stop(
                 name=leg["origin"]["name"],
                 latitude=leg["origin"]["location"]["latitude"],
                 longitude=leg["origin"]["location"]["longitude"],
+                id=leg["origin"]["id"],
                 transportations=transportations_start)
+            
             transportations_end = [product for product, active in leg["destination"]["products"].items()  if active]
             end_stop=Stop(
                 name=leg["destination"]["name"],
                 latitude=leg["destination"]["location"]["latitude"],
                 longitude=leg["destination"]["location"]["longitude"],
+                id=leg["destination"]["id"],
                 transportations=transportations_end)
-            # 2. start_time, end_time, planned_departure, planned_arrival parsen
+                        
+            #Aus Legs alles auslesen + jene ohne tripID als Fußweg markieren                              
             start_time=datetime.fromisoformat(leg["departure"])
             end_time=datetime.fromisoformat(leg["arrival"])
             planned_departure= datetime.fromisoformat(leg["plannedDeparture"])
             planned_arrival= datetime.fromisoformat(leg["plannedArrival"])
-            transport_id=leg["tripId"]
-
-
-            # 3. Connection-Objekt bauen und connections.append() aufrufen
+            if not leg.get("tripId"):
+                transport_id="walking"
+                line_name="Fußweg"
+                direction_name=leg["destination"]["name"]    
+            else:
+                transport_id=leg["tripId"]
+                direction_name=leg["direction"]
+                line_name=leg["line"]["name"]
+            #Connection-Objekt bauen und connections.append() aufrufen
             connection=Connection(
                 start= start_stop,
                 end= end_stop,
@@ -83,10 +97,12 @@ def get_journeys(from_id: str, to_id: str ) -> list[Journey]:
                 end_time= end_time,
                 transport_id= transport_id,
                 planned_departure= planned_departure,
-                planned_arrival= planned_arrival )
-            connections.append(connection)
-        
-        # DEINE AUFGABE:
+                planned_arrival= planned_arrival,
+                name=line_name,
+                direction=direction_name)
+            
+            connections.append(connection)     
+
         # Journey-Objekt aus connections bauen und journeys.append() aufrufen
         journey=Journey(
             start=connections[0].start, 

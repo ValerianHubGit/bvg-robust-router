@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+
 @dataclass
 class Stop:
     #Jeder Stop erhält Floats für latitude und longitude sowie eine Liste der Verkehrsmittel die dort halten
     name: str
     latitude: float 
     longitude: float
+    id: str
     transportations: list = field(default_factory=list)
 
 @dataclass 
@@ -18,6 +20,8 @@ class Connection:
     transport_id: str 
     planned_departure: datetime
     planned_arrival: datetime
+    name: str
+    direction: str
 
     @property
     def duration(self) -> int:
@@ -52,18 +56,22 @@ class Journey:
         if len(self.connections)>0:
             return self.connections[-1].end_time
         return self.start_time
+
     @property
     def transfer_windows(self) -> list:
         windows=[]
-        for i in range(len(self.connections)-1):
+        verbindungen=[x for x in self.connections if x.name!="Fußweg"]
+        for i in range(len(verbindungen)-1):
             #identify real transfers
-            if self.connections[i].transport_id != self.connections[i+1].transport_id:
+            transfer=[verbindungen[i], verbindungen[i+1]]
+            if transfer[0].transport_id != transfer[1].transport_id:
                 #append time window for transfer between connection i and i+1 in minutes
-                windows.append((self.connections[i+1].start_time-self.connections[i].end_time).total_seconds() /60)
+                windows.append((transfer[1].start_time-transfer[0].end_time).total_seconds() /60)
         return windows
         
     @property
     def num_transfers(self) -> int:
         #Anzahl echter transfers
         return len(self.transfer_windows)
+        
         
