@@ -1,4 +1,4 @@
-from itertools import product
+#from itertools import product
 from datetime import datetime
 from src.api.models import Journey
 from src.api.bvg_client import get_journeys, get_stops

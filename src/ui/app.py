@@ -6,7 +6,7 @@ from src.graph.router import find_robust_journeys
 st.title("🚇 BVG Robust Router")
 st.subheader("Nicht die schnellste – die zuverlässigste Verbindung")
 
-start_query = st.text_input("Starthaltestellte")
+start_query = st.text_input("Starthaltestelle")
 end_query = st.text_input("Zielhaltestelle")
 
 now = datetime.now()
@@ -27,7 +27,7 @@ if st.button("Verbindungen suchen"):
     if start and end:
        with st.spinner("Verbindungen werden bewertet"):
             # 4. find_robust_journeys() aufrufen
-            sorted_journey_list, robustness_scores = find_robust_journeys(start_query,end_query, when=datetime.now())
+            sorted_journey_list, robustness_scores = find_robust_journeys(start_query,end_query, when)
         # 5. st.write() um Ergebnisse anzuzeigen
             for i, (journey, score) in enumerate(zip(sorted_journey_list, robustness_scores)):
                 with st.expander(f"Verbindung {i+1} – Score: {score:.1f} | {journey.journey_time} Min | {journey.num_transfers} Umstiege"):
