@@ -38,10 +38,10 @@ def get_stops(query: str) -> list[Stop]:
     
     return stops
 
-def get_journeys(from_id: str, to_id: str ) -> list[Journey]:
+def get_journeys(from_id: str, to_id: str, when: datetime ) -> list[Journey]:
     try:                                                    #do we get data?
         response = requests.get(f"{BASE_URL}/journeys",
-                                params={"from": from_id, "to": to_id, "results": 5},
+                                params={"from": from_id, "to": to_id, "results": 10, "transferTime":2, "departure": when.isoformat()},
                                 timeout=10)
         response.raise_for_status()
     except requests.exceptions.ConnectionError:
@@ -111,3 +111,21 @@ def get_journeys(from_id: str, to_id: str ) -> list[Journey]:
             connections= connections)
         journeys.append(journey)
     return journeys
+
+"""  Stellen wir noch auf einer Karte die Verbindung visuell dar?
+get_trip(id: int) -> Trip:
+    try:                                                    #do we get data?
+        response = requests.get(f"{BASE_URL}/trip",
+                                params={"id": id},
+                                timeout=10)
+        response.raise_for_status()       
+    except requests.exceptions.ConnectionError:
+        print("Keine Verbindung zur BVG-API")
+        return None
+    except requests.exceptions.Timeout:
+        print("BVG-API antwortet nicht")
+        return None
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Fehler: {e}")
+        return None
+"""

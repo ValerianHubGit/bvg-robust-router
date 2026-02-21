@@ -1,8 +1,8 @@
 from src.api.models import Journey
 
-W1 = 0.5   # Gewicht Gesamtdauer
-W2 = 3.0   # Gewicht Umstiegsrisiko
-W3 = 5.0   # Gewicht Anzahl Umstiege
+W1 = 0.3   # Gewicht Gesamtdauer
+W2 = 4.0   # Gewicht Umstiegsrisiko
+W3 = 8.0   # Gewicht Anzahl Umstiege
 
 def robustness_score(journey: Journey) -> float:
     # T: Gesamtdauer
