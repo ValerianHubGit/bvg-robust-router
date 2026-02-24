@@ -1,4 +1,5 @@
 from src.api.models import Journey
+#Achtung, Wahl der Formel und Gewichte intuitiv, nicht empirisch
 
 W1 = 0.3   # Gewicht Gesamtdauer
 W2 = 4.0   # Gewicht Umstiegsrisiko
