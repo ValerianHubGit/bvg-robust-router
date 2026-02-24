@@ -25,7 +25,7 @@ def get_stops(query: str) -> list[Stop]:
         if item["type"] != "stop":
             continue
         
-        transportations = [product for product, active in item["products"].items()  if active]
+        transportations = [product for product, active in item["products"].items()  if active] #wäre relevant gewesen für Bau des Graphennetzes
         
         stop = Stop(name=item["name"],
                     latitude=item["location"]["latitude"],
